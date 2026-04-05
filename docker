@@ -1,0 +1,177 @@
+CI/CD Pipeline Setup - Step by Step Guide
+
+1. Create Git Repository & Files
+
+Step 1: Create Repository
+- Go to GitHub → Click New Repository
+- Repository Name: docker_proj
+- Visibility: Public
+- Click Create Repository
+
+Step 2: Create Files
+
+index.html:
+<!DOCTYPE html>
+<html>
+<head>
+<title>CI/CD Demo</title>
+<style>
+body {
+  text-align: center;
+  font-family: Arial;
+  background-color: red;
+}
+h1 {
+  color: #fff;
+}
+</style>
+</head>
+<body>
+<h1>CI/CD Pipeline Working</h1>
+<h2>Deployed using Jenkins + Docker + Kubernetes</h2>
+<p>This webpage is automatically deployed using a CI/CD pipeline.</p>
+</body>
+</html>
+
+Dockerfile:
+FROM nginx:latest
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+
+deployment.yaml:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: html-demo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: html-demo
+  template:
+    metadata:
+      labels:
+        app: html-demo
+    spec:
+      containers:
+      - name: html-demo
+        image: sweta06/html-demo:latest
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: html-demo-service
+spec:
+  type: NodePort
+  selector:
+    app: html-demo
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30010
+
+Step 3: Push to GitHub
+- Upload all files
+- Add commit message
+- Click Commit changes
+
+
+2. Enable Kubernetes
+
+- Open Docker Desktop
+- Go to Settings
+- Select Kubernetes tab
+- Enable Kubernetes
+- Click Apply & Restart
+
+
+3. Jenkins Setup
+
+Step 1: Add DockerHub Credentials
+- Manage Jenkins → Credentials → Add
+- Kind: Username with password
+- ID: dockerhub
+
+Step 2: Add Kubernetes Credentials
+- Kind: Secret file
+- Upload: C:\Users\Administrator\.kube\config
+- ID: kubeconfig
+
+
+4. Create Pipeline
+
+- New Item → Name: docker_pipeline
+- Select Pipeline
+- Click OK
+
+
+5. Pipeline Code
+
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'docker/html-demo'
+    }
+
+    stages {
+
+        stage('Clone Code') {
+            steps {
+                git branch: 'main',
+                url: 'https://github.com/joshiths2023-web/docker_proj.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t %DOCKER_IMAGE% .'
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    bat 'docker login -u %USER% -p %PASS%'
+                    bat 'docker push %DOCKER_IMAGE%'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(
+                    credentialsId: 'kubeconfig',
+                    variable: 'KUBECONFIG'
+                )]) {
+                    bat """
+                    set KUBECONFIG=%KUBECONFIG%
+                    kubectl apply -f deployment.yaml --validate=false
+                    """
+                }
+            }
+        }
+    }
+}
+
+
+6. Run Pipeline
+
+- Click Build Now
+- Verify all stages execute successfully
+
+
+7. Final Output
+
+Open browser:
+http://localhost:30010
+
+Expected Output:
+CI/CD Pipeline Working
