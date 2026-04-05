@@ -1,0 +1,61 @@
+GIT
+
+1. Setup & Initialization 
+
+git init                           # Initialize repository
+git clone <url>             # Clone repo from GitHub
+
+2. Basic Workflow 
+
+git status                  		# Check file status
+git add file.py            		 # Stage file
+git add .                   		# Stage all files
+git commit -m "message"     # Commit changes
+
+3. View Changes 
+
+git diff                    # Show changes (before commit)
+git log                     # Full commit history
+git log --oneline           # Short history
+
+4. Branching 
+
+git branch                 		    # List branches
+git checkout -b new-branch  	   # Create + switch branch
+git checkout main           	    # Switch branch
+
+5. Merging 
+
+git merge branch-name       # Merge into current branch
+
+Conflict Fix:
+#Edit file manually
+git add file.py 
+git commit -m "Resolved conflict"
+
+6. Undo Mistakes
+git restore file.py         # Discard changes
+git reset HEAD file.py      # Unstage file
+
+ 7. Remote Repository
+git remote add origin <url>    # Connect to GitHub
+git remote -v                           # Verify remote
+
+
+8. Push & Pull
+git push -u origin main     # Push code
+git pull origin main        # Get latest changes
+git fetch                   # Download changes only
+
+ 9. .gitignore
+*.log
+*.tmp
+__pycache__/
+.env
+
+ 10. Tags (Release)
+git tag v1.0
+git push origin v1.0
+
+
+JENKINS
