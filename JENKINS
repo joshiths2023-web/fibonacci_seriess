@@ -1,0 +1,152 @@
+
+1. BASIC JENKINS JOB (USING FREESTYLE)
+
+Step 1: Open Jenkins → http://localhost:8085 → Login
+
+Step 2: Create Job
+- Click New Item
+- Name: agile_lab_da2
+- Select: Freestyle Project → OK
+
+Step 3: Configure
+General: No changes
+Source Code Management: None
+Build:
+- Add build step → Execute Windows batch command
+- Enter:
+  echo Hello Jenkins
+
+Step 4: Save → Build Now
+
+Step 5: Output
+- Console Output → Hello Jenkins
+
+======
+
+2. JENKINS WITH GIT (USING FREESTYLE + GIT)
+
+Step 1: Create GitHub Repo
+- Name: jenkins-Demo
+- Create file test.txt → "Hello Jenkins"
+
+Step 2: Configure Git in Jenkins
+- Manage Jenkins → Global Tool Configuration
+- Git → Name: Git → Path: git
+
+Step 3: Create Job
+- Name: Git-Auto-Build
+- Type: Freestyle Project
+
+Step 4: Configure
+Source Code Management:
+- Select Git
+- Repository URL: (paste GitHub link)
+- Branch: main
+
+Build:
+- Execute Windows batch command:
+  echo Build Started
+  dir
+  type test.txt
+
+Triggers:
+- Poll SCM
+- Enter: * * * * *
+
+Step 5: Save → Commit in GitHub → Auto Build
+
+===============
+
+3. MULTIPLE JOBS (USING FREESTYLE)
+
+Create Jobs:
+Job-A (Build):
+in build steps(configure) in that command
+Enter: 
+- echo Building application
+
+Job-B (Test):
+- echo Testing application
+
+Job-C (Deploy):
+- echo Deploying application
+
+Configure Chaining:
+Job-A:
+- Post Build Action → Build other projects → Job-B
+
+Job-B:
+- Post Build Action → Build other projects → Job-C
+
+Run Job-A → triggers Job-B → Job-C
+
+===================
+
+4. PIPELINE (USING PIPELINE SCRIPT)
+
+Step 1: Create Job
+- Name: Pipeline-Demo
+- Type: Pipeline
+
+Step 2: Configure
+Pipeline:
+- Definition: Pipeline Script
+- Enter:
+
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps { echo 'Build' }
+        }
+        stage('Test') {
+            steps { echo 'Test' }
+        }
+        stage('Deploy') {
+            steps { echo 'Deploy' }
+        }
+    }
+}
+
+Step 3: Save → Build Now
+
+===================
+
+5. PIPELINE USING GIT (JENKINSFILE)
+
+Step 1: Create Jenkinsfile in GitHub
+
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps { echo 'Building application' }
+        }
+        stage('Test') {
+            steps { echo 'Testing application' }
+        }
+        stage('Deploy') {
+            steps { echo 'Deploying application' }
+        }
+    }
+}
+
+Step 2: Create Job
+- Name: Pipeline-From-Repo
+- Type: Pipeline
+
+Step 3: Configure
+Pipeline:
+- Definition: Pipeline script from SCM
+- SCM: Git
+- Repository URL: (GitHub link)
+- Branch: main
+- Script Path: Jenkinsfile
+
+Triggers:
+- Poll SCM
+- * * * * *
+
+Step 4: Save → Build Now / Commit → Auto build
+
+Step 5: View Stage View
