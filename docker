@@ -93,7 +93,7 @@ Step 3: Push to GitHub
 Step 1: Add DockerHub Credentials
 - Manage Jenkins → Credentials → Add
 - Kind: Username with password
-- ID: dockerhub                             // here username should be joshiths (same as docker signin)
+- ID: dockerhub                             // here username should be joshiths (same as docker signin) and also the password
 
 Step 2: Add Kubernetes Credentials
 - Kind: Secret file
