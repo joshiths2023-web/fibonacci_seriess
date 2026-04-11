@@ -93,7 +93,7 @@ Step 3: Push to GitHub
 Step 1: Add DockerHub Credentials
 - Manage Jenkins → Credentials → Add
 - Kind: Username with password
-- ID: dockerhub
+- ID: dockerhub                             // here username should be joshiths (same as docker signin)
 
 Step 2: Add Kubernetes Credentials
 - Kind: Secret file
@@ -114,7 +114,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'docker/html-demo'
+        DOCKER_IMAGE = 'docker/html-demo'          // instead of docker it should be docker username "joshiths"
     }
 
     stages {
@@ -122,7 +122,7 @@ pipeline {
         stage('Clone Code') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/joshiths2023-web/docker_proj.git'
+                url: 'https://github.com/joshiths2023-web/docker_proj.git'    // git url should change 
             }
         }
 
@@ -134,7 +134,7 @@ pipeline {
 
         stage('Push Image') {
             steps {
-                withCredentials([usernamePassword(
+                withCredentials([usernamePassword(   
                     credentialsId: 'dockerhub',
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
