@@ -13,3 +13,135 @@ changes back to the Git repository [10]
 integration [10]
 • Finally, set up a Pipeline project in Jenkins and execute the CI/CD process by writing and
 running the required pipeline script [20]
+
+
+This looks like a solid assignment. I have adapted your standard Maven + Git + Jenkins workflow to fit the Voting Eligibility System requirements. I’ve kept your specific pipeline structure and Windows-based bat commands exactly as you requested.
+1. Create Maven Project in Git
+1.1 Create Git Repository
+Go to GitHub → New Repository
+Repository name: voting-eligibility-system
+Visibility: Public
+Click Create Repository
+1.2 Add pom.xml
+
+
+
+Create the pom.xml to handle the project configuration and JUnit dependency.
+
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.voting</groupId>
+    <artifactId>voting-eligibility-system</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+1.3 Add Voter.java (The Logic)
+Path: src/main/java/com/voting/Voter.java
+
+
+package com.voting;
+
+public class Voter {
+    private String name;
+    private int age;
+    private String citizenship;
+    private boolean hasValidID;
+
+    public Voter(String name, int age, String citizenship, boolean hasValidID) {
+        this.name = name;
+        this.age = age;
+        this.citizenship = citizenship;
+        this.hasValidID = hasValidID;
+    }
+
+    public String checkEligibility() {
+        if (age < 18) return "Ineligible: Underage";
+        if (!citizenship.equalsIgnoreCase("Indian")) return "Ineligible: Not a citizen";
+        if (!hasValidID) return "Ineligible: Invalid Voter ID";
+        return "Eligible to Vote";
+    }
+}
+
+
+1.4 Add VoterTest.java (The Verification)
+Path: src/test/java/com/voting/VoterTest.java
+
+
+package com.voting;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class VoterTest {
+    @Test
+    public void testEligibleVoter() {
+        Voter v = new Voter("John", 25, "Indian", true);
+        assertEquals("Eligible to Vote", v.checkEligibility());
+    }
+
+    @Test
+    public void testUnderage() {
+        Voter v = new Voter("Alice", 16, "Indian", true);
+        assertEquals("Ineligible: Underage", v.checkEligibility());
+    }
+
+    @Test
+    public void testNonCitizen() {
+        Voter v = new Voter("Bob", 30, "US", true);
+        assertEquals("Ineligible: Not a citizen", v.checkEligibility());
+    }
+}
+
+
+2. Push and Clone Repository
+Clone: In VS Code, use Ctrl+Shift+P → Git Clone and paste your repo URL.
+Verify: Ensure the folder structure matches: src/main/java/... and src/test/java/....
+Commit & Push: Sync your changes back to GitHub.
+3. Local Build & Verification
+Open your terminal in VS Code and run:
+mvn compile
+mvn test
+mvn clean install
+4. Create Jenkins Pipeline
+New Item → Name: voting-system-pipeline
+Select Pipeline → Click OK.
+In the Pipeline Script section, use the following code (make sure to update your GitHub URL):
+
+pipeline {
+    agent any
+    stages {
+        stage('Clone') {
+            steps {
+                // Update the URL below to your specific repository
+                git 'https://github.com/YOUR_USERNAME/voting-eligibility-system.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                bat 'mvn compile'
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+        stage('Package') {
+            steps {
+                bat 'mvn clean install'
+            }
+        }
+    }
+}
+
+5. Execution
+Click Build Now in Jenkins.
+Once finished, check the Console Output to see the JUnit test results and the "SUCCESS" message.
